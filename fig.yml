@@ -1,0 +1,17 @@
+logstash:
+    build: .
+    volumes:
+        - logstash.conf:/opt/logstash/conf.d/logstash.conf
+    ports:
+        - 514:514
+        - 514:514/udp
+        - 9200:9200
+        - 9292:9292
+logspout:
+    image: logspout:v2
+    volumes:
+        - /var/run/docker.sock:/tmp/docker.sock
+    links:
+        - logstash:logstash
+    entrypoint: /bin/sh
+    command: -c '/bin/logspout \"${LOGSTASH_PORT_514_UDP/udp/syslog}/?exclude=logstash_logstash_*\"'
